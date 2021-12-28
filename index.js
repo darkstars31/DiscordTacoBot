@@ -1,12 +1,12 @@
 const dotenv = require('dotenv');
 const { Client, Intents } = require('discord.js');
-const sqlite3 = require('sqlite3').verbose();
 
 const ContentHelper = require("./messageContentHelper.js");
+const Dao = require("./dao.js");
 
-var db = new sqlite3.Database(':memory:');
+
 dotenv.config();
-
+const environment = process.env.environment;
 const client = new Client({ intents: [Intents.FLAGS.GUILDS,
     Intents.FLAGS.GUILD_MESSAGES] });
 
@@ -17,15 +17,20 @@ client.once('ready', ( c ) => {
 });
 
 client.on('messageCreate', async (msg) => {
-    const { author, content } = msg;
+    const { guildId, channelId, author, mentions, content } = msg;
+    console.log( msg );
     console.log( `${author.username}: ${content}` );
     if( content.includes('@') && content.includes('🌮')){
-        userIds = ContentHelper.getUserIdsFromContent( msg );
-        console.log(userIds);
-        for( let userId in userIds) {
-            let user = await client.user.fetch( userId );
-            console.log( user );
-            console.log( `Taco from ${author.username} to ${user.username}#${user.discriminator}` );
+        userIdList = ContentHelper.getUserIdsFromContent( msg );
+        const usersList = [];
+        for( const userId of userIdList) {
+            let user = await client.users.fetch( userId ).catch( e => console.error( e ));
+            if ( user ) {
+                usersList.push(user);
+                //console.log( user );
+                console.log( `Taco from ${author.username} to ${user.username}#${user.discriminator}` );
+                Dao.saveTaco( msg, user);
+            }
         }
     }
 })
