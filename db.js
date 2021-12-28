@@ -5,11 +5,11 @@ db.serialize(function() {
     db.run(`
         CREATE TABLE IF NOT EXISTS tacos (
             id INTEGER PRIMARY KEY,
-            userIdReceived INTEGER NOT NULL,
+            userIdReceived BIGINT NOT NULL,
             userReceived TEXT NOT NULL,
-            userIdSent INTEGER NOT NULL,
+            userIdSent BIGINT NOT NULL,
             userSent TEXT NOT NULL,
-            guildId INTEGER NOT NULL,
+            guildId BIGINT NOT NULL,
             datetime TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );`);
 
