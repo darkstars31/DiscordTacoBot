@@ -19,7 +19,10 @@ client.once('ready', ( c ) => {
 client.on('messageCreate', async (msg) => {
 	const { author, content } = msg;
 	if( content.includes('@') && content.includes('🌮')){
+		const numTacosSentByAuthorInLastDay = Dao.tacosSentInLastDay(author.id);
 		const userIdList = ContentHelper.getUserIdsFromContent( msg );
+		const usersList = [];
+
 		if(userIdList.includes(author.id)) {
             Dao.saveViolation(author.id);
             Dao.getViolationsRowId( ( violationCount ) => {
@@ -28,15 +31,21 @@ client.on('messageCreate', async (msg) => {
             });
 		    return;
 		}
-		const usersList = [];
-		const numTacosSentByAuthorInLastDay = Dao.tacosSentInLastDay(author.id);
+		
 		if( numTacosSentByAuthorInLastDay <= DAILY_TACO_LIMIT_PER_USER ) {
-			for( const userId of userIdList) {
-				let user = await client.users.fetch( userId ).catch( e => console.error( e ));
-				if ( user ) {
-					usersList.push(user);
-					console.log( `Taco from ${author.username} to ${user.username}#${user.discriminator}` );
-					Dao.saveTaco( msg, user);
+			for( const userId of userIdList ) {
+				const remainingTacos = DAILY_TACO_LIMIT_PER_USER - numTacosSentByAuthorInLastDay;
+				if (remainingTacos > 0){
+					let user = await client.users.fetch( userId ).catch( e => console.error( e ));
+					if ( user ) {
+						usersList.push(user);
+						console.log( `>> ${author.username}#${user.discriminator} gave a taco to ${user.username}#${user.discriminator}` );
+						Dao.saveTaco( msg, user);
+					}
+					remainingTacos--;
+				} else {
+					author.send(`Aw crap, you exceeded the maximum taco limit today (${DAILY_TACO_LIMIT_PER_USER}).\n
+                        New (fresh) tacos will be arriving shortly, thank you for patience.`);
 				}
 			}
 		} else {

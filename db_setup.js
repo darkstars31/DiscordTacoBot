@@ -21,10 +21,10 @@ db.serialize(function() {
 		);
 	`);
 
-	db.run(`INSERT INTO tacos 
-		(userIdReceived, userReceived, userIdSent, userSent, guildId) 
-		VALUES
-		(777,'{ id: 777, username: "Timmy"}',888,'{ id: 888, username: "Cartman"}',37)`);
+	// db.run(`INSERT INTO tacos 
+	// 	(userIdReceived, userReceived, userIdSent, userSent, guildId) 
+	// 	VALUES
+	// 	(777,'{ id: 777, username: "Timmy"}',888,'{ id: 888, username: "Cartman"}',37)`);
   
 });
   
