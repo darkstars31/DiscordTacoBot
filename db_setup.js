@@ -1,5 +1,4 @@
-var sqlite3 = require('sqlite3').verbose();
-var db = new sqlite3.Database('db/database.db'); // :memory: option sets in-memory db
+const db = require("./dao/dbContext");
 
 db.serialize(function() {
 	db.run(`

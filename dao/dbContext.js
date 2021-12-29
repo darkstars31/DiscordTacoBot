@@ -1,4 +1,11 @@
 var sqlite3 = require('sqlite3').verbose();
-var db = new sqlite3.Database('db/database.db');
+const { open } = require('sqlite');
 
-exports.db = db;
+async function openDb() { 
+    return await open({
+        filename: 'db/database.db',
+        driver: sqlite3.Database,
+    }); //new sqlite3.Database('db/database.db');
+}
+
+exports.openDb = openDb;

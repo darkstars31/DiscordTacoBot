@@ -19,20 +19,20 @@ client.once('ready', ( c ) => {
 client.on('messageCreate', async (msg) => {
 	const { author, content } = msg;
 	if( content.includes('@') && content.includes('🌮')){
-		const numTacosSentByAuthorInLastDay = Dao.tacosSentInLastDay(author.id);
+		const numTacosSentByAuthorInLastDay = await Dao.getTacosSentInLastDay(author.id);
 		const userIdList = ContentHelper.getUserIdsFromContent( msg );
 		const usersList = [];
 
-		if(userIdList.includes(author.id)) {
-            Dao.saveViolation(author.id);
-            Dao.getViolationsRowId( ( violationCount ) => {
-                console.log(`User ${author.username} tried to give tacos to themselves, #${violationCount.id} silly users.`);
-                author.send(`VIOLATION: You cannot give yourself tacos.\nThis incident will be reported to the authorities, your case number for this offense is #${violationCount.id}.`);
-            });
-		    return;
-		}
-		
-		if( numTacosSentByAuthorInLastDay <= DAILY_TACO_LIMIT_PER_USER ) {
+		// if(userIdList.includes(author.id)) {
+        //     Dao.saveViolation(author.id);
+        //     Dao.getViolationsRowId( ( violationCount ) => {
+        //         console.log(`User ${author.username} tried to give tacos to themselves, #${violationCount.id} silly users.`);
+        //         author.send(`VIOLATION: You cannot give yourself tacos.\nThis incident will be reported to the authorities, your case number for this offense is #${violationCount.id}.`);
+        //     });
+		//     return;
+		// }
+		console.log( numTacosSentByAuthorInLastDay, ' >= ', DAILY_TACO_LIMIT_PER_USER)
+		if( numTacosSentByAuthorInLastDay >= DAILY_TACO_LIMIT_PER_USER ) {
 			for( const userId of userIdList ) {
 				const remainingTacos = DAILY_TACO_LIMIT_PER_USER - numTacosSentByAuthorInLastDay;
 				if (remainingTacos > 0){
@@ -49,7 +49,7 @@ client.on('messageCreate', async (msg) => {
 				}
 			}
 		} else {
-			author.send(`Aw crap, you exceeded the maximum taco limit today (${DAILY_TACO_LIMIT_PER_USER}).\n
+			author.send(`Aww crap, you exceeded the maximum taco limit today (${DAILY_TACO_LIMIT_PER_USER}).\n
                         New (fresh) tacos will be arriving shortly, thank you for patience.`);
 		}
 	}
@@ -61,12 +61,12 @@ client.on('interactionCreate', async interaction => {
 
 	const { commandName } = interaction;
 
-	if (commandName === 'ping') {
+	if (commandName === 'toptacos') {
+		const leaderboard = await Dao.getGuildLeaderBoard(interaction.guildId);
+		console.log(leaderboard);
 		await interaction.reply('Pong!');
-	} else if (commandName === 'server') {
+	} else if (commandName === 'mytacos') {
 		await interaction.reply('Server info.');
-	} else if (commandName === 'user') {
-		await interaction.reply('User info.');
 	}
 });
 
