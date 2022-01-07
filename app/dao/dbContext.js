@@ -4,8 +4,10 @@ import { open } from 'sqlite';
 sqlite3.verbose();
 
 export const dbContext = async () => { 
-    return await open({
+    const db = await open({
         filename: 'db/database.db',
         driver: sqlite3.Database,
     });
+    db.get("PRAGMA foreign_keys = ON")
+    return db;
 };

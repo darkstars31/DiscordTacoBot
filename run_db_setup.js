@@ -10,7 +10,7 @@ import { dbContext } from "./app/dao/dbContext.js";
 				username TEXT NOT NULL,
 				tag TEXT NOT NULL,
 				metadata TEXT NOT NULL,
-				guildId BIGINT NOT NULL,
+				guildId BIGINT DEFAULT NULL,
 				datetime TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 			);
 		`);
