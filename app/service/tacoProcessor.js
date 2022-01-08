@@ -1,5 +1,6 @@
 import { getUserIdsFromContent } from '../utils/messageParser.js';
 import { saveTaco, getTacosSentInLastDay } from '../dao/dao.js';
+import { createUser, getUser } from '../dao/userDao.js';
 import { saveViolation, getViolationsRowId } from '../dao/violationDao.js';
 import { log } from '../utils/logger.js';
 
@@ -17,30 +18,27 @@ export async function captureSentTacos( client, message ) {
             const numTacosSentByAuthorInLastDay = (await getTacosSentInLastDay(author.id)).length;
 
             log.info( numTacosSentByAuthorInLastDay, ' <= ', DAILY_TACO_LIMIT_PER_USER)
-
-            const users = await Promise.all( userIdList.map( async userId => await client.users.fetch( userId )));
-            if( users ) {
-                log.debug( users );
+            const usersFromDatabase = await Promise.all( userIdList.map( async userId => await getUser( userId )));
+            const usersFetchedFromDiscord = await Promise.all( 
+                userIdList.filter(userId => !usersFromDatabase.filter(Boolean).map( user => user.userId ).includes(userId))
+                .map( async userId => await client.users.fetch( userId )));
+            log.debug( usersFetchedFromDiscord );
+            
+            if( usersFetchedFromDiscord ) {
+                usersFetchedFromDiscord.forEach( async user => await createUser( user ));
             }
 
-            if( numTacosSentByAuthorInLastDay <= DAILY_TACO_LIMIT_PER_USER ) {
-                for( const userId of userIdList ) {
-                        let user = await client.users.fetch( userId ).catch( e => console.error( e ));
-                        const usersList = [];
-                        if ( user ) {
-                            usersList.push(user);
-                            saveTaco( message, user);
-                            log.info( `>> ${author.username}#${user.discriminator} gave a taco to ${user.username}#${user.discriminator}` );
-                        }
-                    // } else {
-                    //     author.send(`Aw crap, you exceeded the maximum taco limit today (${DAILY_TACO_LIMIT_PER_USER}).\n
-                    //         New (fresh) tacos will be arriving shortly, thank you for patience.`);
-                    //  }
-                }
-            } else {
-                author.send(`Aww crap, you exceeded the maximum taco limit today (${DAILY_TACO_LIMIT_PER_USER}).\n
-                            New (fresh) tacos will be arriving shortly, thank you for patience.`);
+            const users = [...usersFromDatabase.filter(Boolean), ...usersFetchedFromDiscord.filter(Boolean)];
+
+            if( users.length > 0 ) {
+                users.forEach( user => {
+                    saveTaco( message, user);
+                    log.info( `>> ${author.username}#${user.discriminator} gave a taco to ${user.username}#${user.discriminator}` );
+                });
             }
+   
+                // author.send(`Aww crap, you exceeded the maximum taco limit today (${DAILY_TACO_LIMIT_PER_USER}).\n
+                //             New (fresh) tacos will be arriving shortly, thank you for patience.`);   
         }
 }
 

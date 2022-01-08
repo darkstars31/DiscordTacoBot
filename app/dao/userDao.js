@@ -6,11 +6,11 @@ export const getUser = async ( id ) => {
 }
 
 export const createUser = async ( user ) => {
-    const sql = `INSERT INTO user 
-        ( userId, username, tag, metadata, guildId) 
+    const sql = `INSERT INTO users
+        ( userId, username, metadata, guildId) 
         VALUES 
-        (${user.id}, '${user.username}', '${user.tag}', '${JSON.stringify(user)}')`;
+        (${user.id}, '${user.username}', '${JSON.stringify(user)}', null)`;
 
     const db = await dbContext();
-    return db.run(`SELECT * from users WHERE userId = ${id}`);
+    return db.run(sql);
 }
