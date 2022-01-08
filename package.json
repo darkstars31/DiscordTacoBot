@@ -4,6 +4,9 @@
   "description": "",
   "main": "index.js",
   "type": "module",
+  "engines": {
+    "node": ">=16.0.0"
+  },
   "scripts": {
     "start": "nodemon index.js | ./node_modules/.bin/bunyan --output short",
     "windows-start": "nodemon index.js | node_modules\\.bin\\bunyan.cmd --output short",

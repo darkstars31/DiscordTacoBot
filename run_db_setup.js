@@ -11,16 +11,18 @@ import { dbContext } from "./app/dao/dbContext.js";
 				tag TEXT NOT NULL,
 				metadata TEXT NOT NULL,
 				guildId BIGINT DEFAULT NULL,
-				datetime TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+				datetime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+				UNIQUE( userId )
 			);
 		`);
 		db.run(`
 			CREATE TABLE IF NOT EXISTS guilds (
 				id INTEGER PRIMARY KEY,
 				guildId BIGINT NOT NULL,
-				guildName TEXT NOT NULL,
+				name TEXT NOT NULL,
 				metadata TEXT NOT NULL,
-				datetime TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+				datetime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+				UNIQUE( guildId )
 			)
 		`);
 		db.run(`
@@ -40,7 +42,7 @@ import { dbContext } from "./app/dao/dbContext.js";
 				datetime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 				FOREIGN KEY(senderId) REFERENCES users(userId),
 				FOREIGN KEY(recipientId) REFERENCES users(userId),
-				FOREIGN KEY(guildId) REFERENCES guilds(guildId)
+				FOREIGN KEY(guildId) REFERENCES guilds(guildId),
 			);
 		`);
 });
