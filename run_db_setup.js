@@ -18,6 +18,7 @@ import { dbContext } from "./app/dao/dbContext.js";
 				id INTEGER PRIMARY KEY,
 				userId BIGINT NOT NULL,
 				username TEXT NOT NULL,
+				discriminator INT NOT NULL,
 				metadata TEXT NOT NULL,
 				guildId BIGINT DEFAULT NULL,
 				datetime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

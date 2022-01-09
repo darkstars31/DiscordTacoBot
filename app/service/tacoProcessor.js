@@ -2,7 +2,7 @@ import { getUserIdsFromContent } from '../utils/messageParser.js';
 import { saveTaco, getTacosSentInLastDay } from '../dao/dao.js';
 import { createUser, getUser } from '../dao/userDao.js';
 import { saveViolation, getViolationsRowId } from '../dao/violationDao.js';
-import { createGuild } from "../dao/guildDao.js";
+import { createGuild, getGuild } from "../dao/guildDao.js";
 import { log } from '../utils/logger.js';
 
 const DAILY_TACO_LIMIT_PER_USER = 3;
@@ -15,14 +15,18 @@ export async function captureSentTacos( client, message ) {
             // if( await selfGratificationViolation( userIdList, author)) {
             //     return;
             // }
-            log.debug('message.mentions', message.mentions);
-            const guild = await client.guilds.fetch( guildId );
-            createGuild( guild );
+            //log.debug('message.mentions', message.mentions);
+            const guildFromDatabase = await getGuild( guildId );
+            if (!guildFromDatabase?.guildId === guildId){
+                const guildFetchedFromDiscord = await client.guilds.fetch( guildId );
+                await createGuild( guildFetchedFromDiscord );
+            }
 
             const numTacosSentByAuthorInLastDay = (await getTacosSentInLastDay(author.id)).length;
 
             log.info( numTacosSentByAuthorInLastDay, ' <= ', DAILY_TACO_LIMIT_PER_USER)
             const usersFromDatabase = await Promise.all( userIdList.map( async userId => await getUser( userId )));
+            log.debug('Users from DB:', usersFromDatabase.map( u => u?.userId));
             const usersFetchedFromDiscord = await Promise.all( 
                 userIdList.filter(userId => !usersFromDatabase.filter(Boolean).map( user => user.userId ).includes(userId))
                 .map( async userId => await client.users.fetch( userId )));
@@ -30,6 +34,7 @@ export async function captureSentTacos( client, message ) {
             usersFetchedFromDiscord.forEach( async user => await createUser( user ));
             
             const users = [...usersFromDatabase.filter(Boolean), ...usersFetchedFromDiscord.filter(Boolean)];
+            log.debug( users );
 
             users.forEach( user => {
                 saveTaco( message, user);

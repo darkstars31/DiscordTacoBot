@@ -7,10 +7,9 @@ export const getUser = async ( id ) => {
 
 export const createUser = async ( user ) => {
     const sql = `INSERT INTO users
-        ( userId, username, metadata, guildId) 
-        VALUES 
-        (${user.id}, '${user.username}', '${JSON.stringify(user)}', null)`;
+        ( userId, username, discriminator, metadata, guildId) 
+        VALUES (?,?,?,?,?)`;
 
     const db = await dbContext();
-    return db.run(sql);
+    return db.run(sql, [user.id,user.username,user.discriminator,JSON.stringify(user), null]);
 }

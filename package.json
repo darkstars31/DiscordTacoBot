@@ -9,7 +9,8 @@
   },
   "scripts": {
     "start": "nodemon index.js | ./node_modules/.bin/bunyan --output short",
-    "windows-start": "nodemon index.js | node_modules\\.bin\\bunyan.cmd --output short",
+    "start-win": "nodemon index.js | node_modules\\.bin\\bunyan.cmd --output short",
+    "setup": "node run_db_setup.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Anthony Santi",

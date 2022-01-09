@@ -9,7 +9,7 @@ export const getGuild = async ( id ) => {
 
 export const createGuild = async ( guild ) => {
     const sql =`INSERT INTO guilds (guildId, name, metadata) 
-    VALUES ('${guild.id}',${guild.name},'${JSON.stringify(guild)}')`;
+    VALUES ( ?, ?, ?)`;
 	const db = await dbContext();
-	return db.run(sql, {}, err => log.error( err ));
+	return db.run(sql, [guild.id, guild.name,JSON.stringify(guild)], err => log.error( err ));
 }
