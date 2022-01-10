@@ -6,7 +6,7 @@ import { dbContext } from "./app/dao/dbContext.js";
 		db.run(`
 			CREATE TABLE IF NOT EXISTS guilds (
 			id INTEGER PRIMARY KEY,
-			guildId BIGINT NOT NULL,
+			guildId TEXT NOT NULL,
 			name TEXT NOT NULL,
 			metadata TEXT NOT NULL,
 			datetime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -16,11 +16,11 @@ import { dbContext } from "./app/dao/dbContext.js";
 		db.run(`
 			CREATE TABLE IF NOT EXISTS users (
 				id INTEGER PRIMARY KEY,
-				userId BIGINT NOT NULL,
+				userId TEXT NOT NULL,
 				username TEXT NOT NULL,
 				discriminator INT NOT NULL,
 				metadata TEXT NOT NULL,
-				guildId BIGINT DEFAULT NULL,
+				guildId TEXT DEFAULT NULL,
 				datetime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 				FOREIGN KEY(guildId) REFERENCES guilds(guildId),
 				UNIQUE( userId )
@@ -29,7 +29,7 @@ import { dbContext } from "./app/dao/dbContext.js";
 		db.run(`
 			CREATE TABLE IF NOT EXISTS violations (
 				id INTEGER PRIMARY KEY,
-				userId BIGINT NOT NULL,
+				userId TEXT NOT NULL,
 				datetime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 				FOREIGN KEY(userId) REFERENCES users(userId)
 			);
@@ -37,9 +37,9 @@ import { dbContext } from "./app/dao/dbContext.js";
 		db.run(`
 			CREATE TABLE IF NOT EXISTS tacos (
 				id INTEGER PRIMARY KEY,
-				senderId BIGINT NOT NULL,
+				senderId TEXT NOT NULL,
 				recipientId TEXT NOT NULL,
-				guildId BIGINT NOT NULL,
+				guildId TEXT NOT NULL,
 				datetime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 				FOREIGN KEY(senderId) REFERENCES users(userId),
 				FOREIGN KEY(recipientId) REFERENCES users(userId),

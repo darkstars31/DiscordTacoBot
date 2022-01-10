@@ -7,3 +7,8 @@ export const getUserIdsFromContent = ( msg ) => {
     log.debug( `User Id List:`,  userIds )
     return userIds.map( userId => userId.substring(2));
 }
+
+export const parseNumTacosFromMessage = ( msg ) => {
+    const { content } = msg;
+    return content.split('🌮').length - 1;
+}

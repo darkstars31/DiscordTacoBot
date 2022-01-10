@@ -2,9 +2,9 @@ import { dbContext } from './dbContext.js';
 import { log } from '../utils/logger.js';
 
 export const getGuild = async ( id ) => {
-    const sql =`SELECT * FROM guilds WHERE guildId = ${id}`;
+    const sql =`SELECT * FROM guilds WHERE guildId = ?`;
 	const db = await dbContext();
-	return db.get(sql, {}, err => log.error( err ));
+	return db.get(sql, [ id ], err => log.error( err ));
 }
 
 export const createGuild = async ( guild ) => {
