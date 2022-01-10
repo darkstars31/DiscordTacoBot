@@ -11,6 +11,8 @@ const guildId = "87222941170831360";
 const commands = [
 	new SlashCommandBuilder().setName('toptacos').setDescription('Displays the TacoBot Top 10 for your server.'),
 	new SlashCommandBuilder().setName('mytacos').setDescription('Displays your tacos received from your server.'),
+	new SlashCommandBuilder().setName('tacohelp').setDescription('Shows the TacoBot help.'),
+
 ].map(command => command.toJSON());
 
 const rest = new REST({ version: '9' }).setToken(process.env.DISCORD_TOKEN);

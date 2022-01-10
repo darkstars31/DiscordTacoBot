@@ -12,7 +12,7 @@ export function eventInitialization( client ) {
     });
     
     client.on('interactionCreate', async interaction => {
-        //console.log( interaction );
+        console.log( interaction );
         if (!interaction.isCommand()) return;
     
         const { commandName } = interaction;
@@ -25,7 +25,22 @@ export function eventInitialization( client ) {
         } else if (commandName === 'mytacos') {
             await interaction.reply('Server info.');
         } else if (commandName === 'tacohelp') {
+            await interaction.reply(`TacoBot Help
+            ############################
+            What is TacoBot?
+            TacoBot is a gratitude sharing platform. Think Reddit silver or gold but instead give your friends tacos. TacoBot uses a fictional emoji currency (the taco emoji 🌮 - :taco:) that you can use to show your gratitude to other community members. The supply of tacos is limited to 4 tacos daily, so share wisely.
+            
+            How do I send tacos?
+            Sending tacos is easy. Just send a message in a text channel that includes those individual's names (ex. '@tacobot) and include the number of tacos (🌮) you wish to send them.
 
+            The Gameification of Gratitude
+            Compete with your fellow community members, view your servers "/toptacos" to see who has the most tacos.
+
+            Commands
+            toptacos - Displays the servers taco leaders
+            mytacos - Displays my tacos
+            tacohelp - Shows this help context window
+            `);
         }
     });
 }
