@@ -10,8 +10,12 @@ export async function getTacosSentInLastDay ( userId ) {
 }
 
 export async function getGuildLeaderBoard ( guildId, limit = 10) {
-	const sql = `SELECT userReceived, COUNT(userReceived) 
-    FROM tacos WHERE guildId = ? GROUP BY userReceived
+	const sql = `SELECT recipientId, users.username, guilds.name as guildName, COUNT() as 'count'
+    FROM tacos
+	JOIN users on recipientId = users.userId
+	JOIN guilds on guilds.guildId = tacos.guildId
+	WHERE tacos.guildId = ? GROUP BY recipientId
+	ORDER BY count DESC
 	LIMIT ?`;
 	const db = await dbContext();
 	return await db.all(sql, [ guildId, limit ], err => {if (err) { throw err; }});

@@ -18,7 +18,7 @@ export async function getSelfTacoViolations ( userId ) {
 
 export async function saveViolation ( userId ) {
 	const sql = `INSERT INTO violations ( userId )
-	            VALUES ( ${userId} )`;
+	            VALUES ( ? )`;
 	const db = await dbContext();
-	return db.run(sql, {}, err => console.error( err ));
+	return db.run(sql, [ userId ], err => console.error( err ));
 }
