@@ -1,9 +1,20 @@
 import { dbContext } from './dbContext.js';
 
 export async function getTacosSentInLastDay ( userId ) {
-	const sql = `SELECT * from tacos 
-    where senderId = ? 
+	const sql = `SELECT * FROM tacos 
+    WHERE senderId = ? 
     AND datetime >= datetime('now','-1 day')`;
+
+	const db = await dbContext();
+	return db.all(sql, [ userId ], err =>{if (err) { throw err; }} );
+}
+
+export async function getTacoHistory ( userId ) {
+	const sql = `SELECT tacos.senderId, users.username, tacos.datetime
+	FROM tacos
+	JOIN users on users.userId = tacos.senderId
+    where tacos.recipientId = ? 
+    AND tacos.datetime >= datetime('now','-1 month')`;
 
 	const db = await dbContext();
 	return db.all(sql, [ userId ], err =>{if (err) { throw err; }} );
