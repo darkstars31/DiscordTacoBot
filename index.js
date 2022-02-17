@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 import { Client, Intents } from 'discord.js';
+import { cacheInitialization } from './app/service/cache.js';
 import { eventInitialization } from './app/events.js';
 import { log } from './app/utils/logger.js';
 
@@ -10,6 +11,7 @@ const client = new Client({ intents: [Intents.FLAGS.GUILDS,Intents.FLAGS.GUILD_M
 // When the client is ready, run this code (only once)
 client.once('ready', ( c ) => {
 	log.info(`Ready! Logged in as ${c.user.tag}`);
+	cacheInitialization();
 	eventInitialization( client );
 });
 

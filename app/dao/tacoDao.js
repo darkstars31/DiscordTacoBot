@@ -1,11 +1,12 @@
 import { dbContext } from './dbContext.js';
 
+const db = await dbContext();
+
 export async function getTacosSentInLastDay ( userId ) {
 	const sql = `SELECT * FROM tacos 
     WHERE senderId = ? 
     AND datetime >= datetime('now','-1 day')`;
 
-	const db = await dbContext();
 	return db.all(sql, [ userId ], err =>{if (err) { throw err; }} );
 }
 
@@ -16,7 +17,6 @@ export async function getTacoHistory ( userId ) {
     where tacos.recipientId = ? 
     AND tacos.datetime >= datetime('now','-1 month')`;
 
-	const db = await dbContext();
 	return db.all(sql, [ userId ], err =>{if (err) { throw err; }} );
 }
 
@@ -28,7 +28,7 @@ export async function getGuildLeaderBoard ( guildId, limit = 10) {
 	WHERE tacos.guildId = ? GROUP BY recipientId
 	ORDER BY count DESC
 	LIMIT ?`;
-	const db = await dbContext();
+
 	return await db.all(sql, [ guildId, limit ], err => {if (err) { throw err; }});
 }
 
@@ -36,6 +36,6 @@ export async function saveTaco ( msg, recipientId ) {
 	const { guildId, author } = msg;
 	const sql =`INSERT INTO tacos (senderId, recipientId, guildId) 
     VALUES (?,?,?)`;
-	const db = await dbContext();
+
 	db.run(sql, [author.id, recipientId, guildId], err => console.error( err ));
 }

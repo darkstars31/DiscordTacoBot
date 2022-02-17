@@ -1,12 +1,12 @@
 import { getUserIdsFromContent, parseNumTacosFromMessage } from '../utils/messageParser.js';
 import { saveTaco, getTacosSentInLastDay } from '../dao/tacoDao.js';
-import { createUser, getUser } from '../dao/userDao.js';
+import { createUser } from '../dao/userDao.js';
 import { saveViolation, getViolationsRowId } from '../dao/violationDao.js';
 import { createGuild, getGuild } from "../dao/guildDao.js";
-import { UserManager } from 'discord.js';
+import { getCachedUser, putCachedUser } from './cache.js';
 import { log } from '../utils/logger.js';
 
-const DAILY_TACO_LIMIT_PER_USER = 4;
+const DAILY_TACO_LIMIT_PER_USER = 99;
 
 export async function captureSentTacos( client, message ) {
     const { author, content, guildId } = message;
@@ -22,8 +22,9 @@ export async function captureSentTacos( client, message ) {
                 return;
             }
 
-            const authorFromDatabase = await getUser( author.id );
-            if( !authorFromDatabase ){
+            const authorFromCache = await getCachedUser( author.id );
+            if( !authorFromCache ){
+                putCachedUser( author );
                 await createUser( author );
             }
 
@@ -34,22 +35,25 @@ export async function captureSentTacos( client, message ) {
                 await createGuild( guildFetchedFromDiscord );
             }
 
-            const usersFromDatabase = await Promise.all( userIdList.map( async userId => await getUser( userId )));
+            const usersFromCache = userIdList.map( userId => getCachedUser( userId )).filter(Boolean);
             const usersFetchedFromDiscord = await Promise.all( 
-                userIdList.filter(userId => !usersFromDatabase.filter(Boolean).map( user => user.userId ).includes(userId))
+                userIdList.filter(userId => !usersFromCache.filter(Boolean).map( user => user.userId ).includes(userId))
                 .map( async userId => await client.users.fetch( userId )));
             
-            usersFetchedFromDiscord.forEach( async user => await createUser( user ));
+            usersFetchedFromDiscord.forEach( async user => {
+                putCachedUser( user );
+                await createUser( user );
+            });
             
-            const users = [...usersFromDatabase.filter(Boolean), ...usersFetchedFromDiscord.filter(Boolean)];
+            const users = [...usersFromCache, ...usersFetchedFromDiscord.filter(Boolean)];
             
             [...Array(tacoCount)].map( () => {
                 users.forEach(async user => {
-                    await saveTaco( message, user?.userId || user.id );
+                    await saveTaco( message, user.id );
                 });
             });
             users.forEach( user => {
-                client.users.cache.get(user?.userId || user.id).send(`You have received taco(s) from ${author.username}`);
+                client.users.cache.get(user.id).send(`You have received taco(s) from ${author.username}`);
                 log.info( `>> ${author.username}#${author.discriminator} gave ${tacoCount} taco(s) to ${user.username}#${user.discriminator}` );
             });
         }
