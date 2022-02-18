@@ -28,7 +28,6 @@ export async function captureSentTacos( client, message ) {
                 await createUser( author );
             }
 
-            //log.debug('message.mentions', message.mentions);
             const guildFromDatabase = await getGuild( guildId );
             if (!guildFromDatabase){
                 const guildFetchedFromDiscord = await client.guilds.fetch( guildId );
@@ -36,8 +35,9 @@ export async function captureSentTacos( client, message ) {
             }
 
             const usersFromCache = userIdList.map( userId => getCachedUser( userId )).filter(Boolean);
+            log.info('x', usersFromCache );
             const usersFetchedFromDiscord = await Promise.all( 
-                userIdList.filter(userId => !usersFromCache.filter(Boolean).map( user => user.userId ).includes(userId))
+                userIdList.filter(userId => !usersFromCache.map( user => user.id ).includes(userId))
                 .map( async userId => await client.users.fetch( userId )));
             
             usersFetchedFromDiscord.forEach( async user => {

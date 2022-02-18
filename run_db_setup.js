@@ -16,6 +16,7 @@ import { dbContext } from "./app/dao/dbContext.js";
 		db.run(`
 			CREATE TABLE IF NOT EXISTS users (
 				id INTEGER PRIMARY KEY,
+				userId TEXT NOT NULL,
 				metadata TEXT NOT NULL,
 				guildId TEXT DEFAULT NULL,
 				datetime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
